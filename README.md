@@ -1,2 +1,4 @@
-# codewars-java
-Solved kata's and kumite's written in Java
+# CodeWars (Java)
+This repository contains all my solved katas and kumites written in Java.
+
+Each solved problems also has corresponding tests. 
