@@ -22,16 +22,16 @@ public class SimpleAssembler {
 
         private final Integer step;
         private final Type type;
-        private final String register;
-        private final String value;
+        private final String param1;
+        private final String param2;
 
         Instruction(int step, String instruction) {
             String[] split = instruction.split(" ");
 
             this.step = step;
             this.type = Type.valueOf(split[0].toUpperCase());
-            this.register = split[1];
-            this.value = (split.length == 3) ? split[2]: "";
+            this.param1 = split[1];
+            this.param2 = (split.length == 3) ? split[2]: "";
         }
 
         public Integer getStep() {
@@ -42,12 +42,12 @@ public class SimpleAssembler {
             return type;
         }
 
-        public String getRegister() {
-            return register;
+        public String getParam1() {
+            return param1;
         }
 
-        public String getValue() {
-            return value;
+        public String getParam2() {
+            return param2;
         }
 
     }
@@ -101,14 +101,14 @@ public class SimpleAssembler {
     public static Integer mov(Map<String, Integer> registers, Instruction instruction) {
         Integer actualValue;
 
-        // Checks for integer otherwise gets digit from other register
-        if (instruction.getValue().matches("[-+]?\\d*\\.?\\d+")) {
-            actualValue = Integer.parseInt(instruction.getValue());
+        // Checks for integer otherwise gets digit from other param1
+        if (instruction.getParam2().matches("[-+]?\\d*\\.?\\d+")) {
+            actualValue = Integer.parseInt(instruction.getParam2());
         } else {
-            actualValue = registers.get(instruction.getValue());
+            actualValue = registers.get(instruction.getParam2());
         }
 
-        registers.put(instruction.getRegister(), actualValue);
+        registers.put(instruction.getParam1(), actualValue);
 
         return instruction.getStep() + 1;
     }
@@ -120,9 +120,9 @@ public class SimpleAssembler {
      * @return step
      */
     public static Integer inc(Map<String, Integer> registers, Instruction instruction) {
-        Integer currentValue = registers.get(instruction.getRegister());
+        Integer currentValue = registers.get(instruction.getParam1());
 
-        registers.put(instruction.getRegister(), currentValue + 1);
+        registers.put(instruction.getParam1(), currentValue + 1);
 
         return instruction.getStep() + 1;
     }
@@ -134,9 +134,9 @@ public class SimpleAssembler {
      * @return step
      */
     public static Integer dec(Map<String, Integer> registers, Instruction instruction) {
-        Integer currentValue = registers.get(instruction.getRegister());
+        Integer currentValue = registers.get(instruction.getParam1());
 
-        registers.put(instruction.getRegister(), currentValue - 1);
+        registers.put(instruction.getParam1(), currentValue - 1);
 
         return instruction.getStep() + 1;
     }
@@ -148,8 +148,13 @@ public class SimpleAssembler {
      * @return step
      */
     public static Integer jnz(Map<String, Integer> registers, Instruction instruction) {
-        Integer currentValue = registers.get(instruction.getRegister());
-        Integer jumpValue = Integer.parseInt(instruction.getValue());
+        Integer currentValue = registers.get(instruction.getParam1());
+        Integer jumpValue = Integer.parseInt(instruction.getParam2());
+
+        // Null means that param1 was actually a value
+        if (currentValue == null) {
+            currentValue = Integer.parseInt(instruction.getParam1());
+        }
 
         if (currentValue != 0) {
             return instruction.getStep() + jumpValue;
